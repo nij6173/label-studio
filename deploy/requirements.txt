@@ -62,3 +62,9 @@ launchdarkly-server-sdk==7.3.0
 python-json-logger==2.0.4
 
 label-studio-converter==0.0.44
+django-crispy-forms==1.14.0
+django-reversion==5.0.3
+future==0.18.2
+django-formtools==2.4
+httplib2==0.20.4
+django-import-export==3.0.1

@@ -35,7 +35,7 @@ RUN set -eux \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop
+    pip3 install --upgrade pip setuptools -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/ && pip3 install uwsgi uwsgitop -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/
 
 # incapsulate nginx install & configure to a single layer
 RUN set -eux; \
@@ -49,16 +49,16 @@ RUN set -eux; \
 # Copy and install middleware dependencies
 COPY --chown=1001:0 deploy/requirements-mw.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements-mw.txt
+    pip3 install -r requirements-mw.txt -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/
 
 # Copy and install requirements.txt first for caching
 COPY --chown=1001:0 deploy/requirements.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements.txt
+    pip3 install -r requirements.txt -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/
 
 COPY --chown=1001:0 . .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -e . && \
+    pip3 install -e . -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/ && \
     chown -R 1001:0 $LS_DIR && \
     chmod -R g=u $LS_DIR
 

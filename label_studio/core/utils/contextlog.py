@@ -188,6 +188,7 @@ class ContextLog(object):
         return not self.collect_analytics or self._exclude_endpoint(request)
 
     def send(self, request=None, response=None, body=None):
+
         if self.dont_send(request):
             return
         try:
@@ -269,6 +270,7 @@ class ContextLog(object):
         return payload
 
     def send_job(self, request, response, body):
+        return None
         try:
             payload = self.create_payload(request, response, body)
         except:

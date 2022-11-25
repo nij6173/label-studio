@@ -97,15 +97,18 @@ if HOSTNAME:
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
                 logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
+print(f"-----HOSTNAME: {HOSTNAME}")
 
 INTERNAL_PORT = '8080'
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
+SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n123'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_bool_env('DEBUG', True)
-DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
+DEBUG = False
+DEBUG_MODAL_EXCEPTIONS = False
+# DEBUG = get_bool_env('DEBUG', True)
+# DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -155,23 +158,23 @@ DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 
-if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
-    logging.info('Google Cloud Logging handler is enabled.')
-    try:
-        import google.cloud.logging
-        from google.auth.exceptions import GoogleAuthError
+# if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
+#     logging.info('Google Cloud Logging handler is enabled.')
+#     try:
+#         import google.cloud.logging
+#         from google.auth.exceptions import GoogleAuthError
 
-        client = google.cloud.logging.Client()
-        client.setup_logging()
+#         client = google.cloud.logging.Client()
+#         client.setup_logging()
 
-        LOGGING['handlers']['google_cloud_logging'] = {
-            'level': get_env('LOG_LEVEL', 'WARNING'),
-            'class': 'google.cloud.logging.handlers.CloudLoggingHandler',
-            'client': client,
-        }
-        LOGGING['root']['handlers'].append('google_cloud_logging')
-    except GoogleAuthError as e:
-        logger.exception('Google Cloud Logging handler could not be setup.')
+#         LOGGING['handlers']['google_cloud_logging'] = {
+#             'level': get_env('LOG_LEVEL', 'WARNING'),
+#             'class': 'google.cloud.logging.handlers.CloudLoggingHandler',
+#             'client': client,
+#         }
+#         LOGGING['root']['handlers'].append('google_cloud_logging')
+#     except GoogleAuthError as e:
+#         logger.exception('Google Cloud Logging handler could not be setup.')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -204,6 +207,9 @@ INSTALLED_APPS = [
     'ml',
     'webhooks',
     'labels_manager',
+    'xadmin',
+    'crispy_forms',
+    'reversion',
 ]
 
 MIDDLEWARE = [
@@ -257,14 +263,14 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', "spacetool.space.top"]
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend',]
 USE_USERNAME_FOR_LOGIN = False
 
-DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
+DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', True)
 
 # Password validation:
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -358,10 +364,19 @@ GRAPHIQL = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = False
+# LANGUAGE_CODE = 'en-us'
+# TIME_ZONE = 'UTC'
+# USE_I18N = False
+# USE_L10N = True
+# USE_TZ = True
+LANGUAGE_CODE = 'zh-Hans'
+
+TIME_ZONE = 'Asia/Shanghai'
+
+USE_I18N = True
+
 USE_L10N = True
+
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -417,7 +432,7 @@ RANDOM_NEXT_TASK_SAMPLE_SIZE = int(get_env('RANDOM_NEXT_TASK_SAMPLE_SIZE', 50))
 TASK_API_PAGE_SIZE_MAX = int(get_env('TASK_API_PAGE_SIZE_MAX', 0)) or None
 
 # Email backend
-FROM_EMAIL = get_env('FROM_EMAIL', 'Label Studio <hello@labelstud.io>')
+FROM_EMAIL = get_env('FROM_EMAIL', 'moumoumou <jie.ni@space.top>')
 EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailBackend')
 
 ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)

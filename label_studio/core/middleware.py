@@ -105,7 +105,7 @@ class ContextLogMiddleware(CommonMiddleware):
 
     def __init__(self, get_response):
         self.get_response = get_response
-        self.log = ContextLog()
+        # self.log = ContextLog()
 
     def __call__(self, request):
         body = None
@@ -117,7 +117,7 @@ class ContextLogMiddleware(CommonMiddleware):
             except:
                 pass
         response = self.get_response(request)
-        self.log.send(request=request, response=response, body=body)
+        # self.log.send(request=request, response=response, body=body)
         return response
 
 

@@ -26,6 +26,12 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 
+import xadmin
+xadmin.autodiscover()
+
+from xadmin.plugins import xversion
+xversion.register_models()
+
 from core import views
 from core.utils.static_serve import serve
 from core.utils.common import collect_versions
@@ -83,7 +89,7 @@ urlpatterns = [
     path('docs/api/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('docs/', RedirectView.as_view(url='/static/docs/public/guide/introduction.html', permanent=False), name='docs-redirect'),
 
-    path('admin/', admin.site.urls),
+    path('xadmin/', xadmin.site.urls),
     path('django-rq/', include('django_rq.urls')),
     path('feature-flags/', views.feature_flags, name='feature_flags'),
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
