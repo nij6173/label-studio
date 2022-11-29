@@ -32,6 +32,7 @@ deploy/dockerfiles/postgres-data
 deploy/dockerfiles/mysql-data
 postgres-data
 mysql-data
+docker-compose.prod.yml
 
 label_studio/core/media
 label_studio/core/downloads
