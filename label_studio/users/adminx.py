@@ -11,6 +11,7 @@ from projects.models import Project
 from ml.models import MLBackend, MLBackendTrainJob
 from tasks.models import Task, Annotation, Prediction
 from organizations.models import Organization, OrganizationMember
+from data_import.models import FileUpload
 
 
 class UserAdminShort(UserAdmin):
@@ -36,6 +37,7 @@ class UserAdminShort(UserAdmin):
 
 # xadmin.site.register(User, UserAdminShort)
 xadmin.site.register(Project)
+xadmin.site.register(FileUpload)
 xadmin.site.register(MLBackend)
 xadmin.site.register(MLBackendTrainJob)
 xadmin.site.register(Task)
