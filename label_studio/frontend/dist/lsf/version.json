@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
-  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
+  "message": "fix: LSDV-4968: Fix remaining transformer of selected region outside of lifespan",
+  "commit": "9b1f3c7170ca354bc986906c3092c60856da2d60",
   "branch": "master",
-  "date": "2022/12/15 07:52:48"
+  "date": "2023/06/07 08:50:10"
 }

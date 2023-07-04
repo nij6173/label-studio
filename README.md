@@ -23,7 +23,7 @@ Have a custom dataset? You can customize Label Studio to fit your needs. Read an
 
 ## Try out Label Studio
 
-Install Label Studio locally, or deploy it in a cloud instance. Also you can try [Label Studio Teams](https://app.heartex.com).
+Install Label Studio locally, or deploy it in a cloud instance. [Or, sign up for a free trial of our Enterprise edition.](https://heartex.com/free-trial).
 
 - [Install locally with Docker](#install-locally-with-docker)
 - [Run with Docker Compose (Label Studio + Nginx + PostgreSQL)](#run-with-docker-compose)
@@ -67,6 +67,17 @@ To start using the app from `http://localhost` run this command:
 docker-compose up
 ```
 
+### Run with Docker Compose + MinIO
+You can also run it with an additional MinIO server for local S3 storage. This is particularly useful when you want to 
+test the behavior with S3 storage on your local system. To start Label Studio in this way, you need to run the following command:
+````bash
+# Add sudo on Linux if you are not a member of the docker group
+docker compose -f docker-compose.yml -f docker-compose.minio.yml up -d
+````
+If you do not have a static IP address, you must create an entry in your hosts file so that both Label Studio and your 
+browser can access the MinIO server. For more detailed instructions, please refer to [our guide on storing data](docs/source/guide/storedata.md).
+
+
 ### Install locally with pip
 
 ```bash
@@ -82,6 +93,7 @@ label-studio
 ```bash
 conda create --name label-studio
 conda activate label-studio
+conda install psycopg2
 pip install label-studio
 ```
 
@@ -94,6 +106,7 @@ You can run the latest Label Studio version locally without installing the packa
 pip install -e .
 # Run database migrations
 python label_studio/manage.py migrate
+python label_studio/manage.py collectstatic
 # Start the server in development mode at http://localhost:8080
 python label_studio/manage.py runserver
 ```
@@ -225,6 +238,6 @@ Want to use **The Coolest Feature X** but Label Studio doesn't support it? Check
 
 ## License
 
-This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.ai/). 2020-2021
+This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.com/). 2020-2022
 
 <img src="https://user-images.githubusercontent.com/12534576/192582529-cf628f58-abc5-479b-a0d4-8a3542a4b35e.png" title="Hey everyone!" width="180" />
