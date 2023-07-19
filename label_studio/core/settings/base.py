@@ -299,29 +299,29 @@ TEMPLATES = [
 # RQ
 RQ_QUEUES = {
     'critical': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
-        'DEFAULT_TIMEOUT': 180,
+        'HOST': get_env('RQ_QUEUES_HOST_CRITICAL', 'localhost'),
+        'PORT': get_env('RQ_QUEUES_PORT_CRITICAL', 6379),
+        'DB': get_env('RQ_QUEUES_DB_CRITICAL', 0),
+        'DEFAULT_TIMEOUT': get_env('RQ_QUEUES_DEFAULT_TIMEOUT_CRITICAL', 180),
     },
     'high': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
-        'DEFAULT_TIMEOUT': 180,
+        'HOST': get_env('RQ_QUEUES_HOST_HIGH', 'localhost'),
+        'PORT': get_env('RQ_QUEUES_PORT_HIGH', 6379),
+        'DB': get_env('RQ_QUEUES_DB_HIGH', 0),
+        'DEFAULT_TIMEOUT': get_env('RQ_QUEUES_DEFAULT_TIMEOUT_HIGH', 180),
     },
     'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
-        'DEFAULT_TIMEOUT': 180,
+        'HOST': get_env('RQ_QUEUES_HOST_DEFAULT', 'localhost'),
+        'PORT': get_env('RQ_QUEUES_PORT_DEFAULT', 6379),
+        'DB': get_env('RQ_QUEUES_DB_DEFAULT', 0),
+        'DEFAULT_TIMEOUT': get_env('RQ_QUEUES_DEFAULT_TIMEOUT_DEFAULT', 180),
     },
     'low': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
-        'DEFAULT_TIMEOUT': 180,
-    },
+        'HOST': get_env('RQ_QUEUES_HOST_LOW', 'localhost'),
+        'PORT': get_env('RQ_QUEUES_PORT_LOW', 6379),
+        'DB': get_env('RQ_QUEUES_DB_LOW', 0),
+        'DEFAULT_TIMEOUT': get_env('RQ_QUEUES_DEFAULT_TIMEOUT_LOW', 180),
+    }
 }
 
 # Swagger: automatic API documentation
@@ -650,3 +650,25 @@ if CSRF_TRUSTED_ORIGINS:
 
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
+
+
+if get_env("STORAGE_TYPE") == "tcs":
+    CLOUD_FILE_STORAGE_ENABLED = True
+    DEFAULT_FILE_STORAGE = "tencentcos_storage.TencentCOSStorage"
+    TENCENTCOS_STORAGE = {
+        "BUCKET": get_env("TENCENT_BUCKET"),
+        "ROOT_PATH": "/nebula/",
+        "UPLOAD_MAX_BUFFER_SIZE": 100,
+        "UPLOAD_PART_SIZE": 10,
+        "UPLOAD_MAX_THREAD": 5,
+        "CONFIG": {
+            "Region": get_env("TENCENT_REGION"),
+            "SecretId": get_env("TENCENT_SECRETID"),
+            "SecretKey": get_env("TENCENT_SECRETKEY"),
+        }
+    }
+
+
+
+
+

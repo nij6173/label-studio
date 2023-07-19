@@ -114,7 +114,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         on_failure = kwargs.pop('on_failure', None)
         try:
             return job(*args, **kwargs)
-        except Exception:
+        except Exception as e:
             exc_info = sys.exc_info()
             if on_failure:
                 on_failure(job, *exc_info)
