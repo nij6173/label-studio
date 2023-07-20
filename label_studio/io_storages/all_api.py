@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from label_studio.core.utils.common import load_func
+from core.utils.common import load_func
 from .azure_blob.serializers import AzureBlobImportStorageSerializer
 from .gcs.serializers import GCSImportStorageSerializer
 from .localfiles.api import LocalFilesImportStorageListAPI, LocalFilesExportStorageListAPI

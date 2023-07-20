@@ -11,7 +11,7 @@ from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
 from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
 from projects.models import Project
-from label_studio.core.utils.common import round_floats
+from core.utils.common import round_floats
 
 
 class FilterSerializer(serializers.ModelSerializer):

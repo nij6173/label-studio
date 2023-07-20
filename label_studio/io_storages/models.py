@@ -6,7 +6,7 @@ from .azure_blob.models import AzureBlobImportStorage, AzureBlobImportStorageLin
 from .s3.models import S3ImportStorage, S3ImportStorageLink, S3ExportStorage, S3ExportStorageLink
 from .gcs.models import GCSImportStorage, GCSImportStorageLink, GCSExportStorage, GCSExportStorageLink
 from .redis.models import RedisImportStorage, RedisImportStorageLink, RedisExportStorage, RedisExportStorageLink
-from label_studio.core.utils.common import load_func
+from core.utils.common import load_func
 
 
 def get_storage_classes(storage_type='import'):

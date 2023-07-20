@@ -14,8 +14,8 @@ from collections import OrderedDict
 import defusedxml.ElementTree as etree
 from collections import defaultdict
 from django.conf import settings
-from label_studio.core.utils.io import find_file
-from label_studio.core.utils.exceptions import (
+from core.utils.io import find_file
+from core.utils.exceptions import (
     LabelStudioValidationErrorSentryIgnored, LabelStudioXMLSyntaxErrorSentryIgnored
 )
 from label_studio_tools.core import label_config

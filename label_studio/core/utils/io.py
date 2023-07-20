@@ -14,6 +14,7 @@ import yaml
 from urllib.parse import urlparse
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp
+from django.conf import settings
 
 from appdirs import user_config_dir, user_data_dir, user_cache_dir
 
@@ -27,7 +28,11 @@ def good_path(path):
 
 def find_node(package_name, node_path, node_type):
     assert node_type in ('dir', 'file', 'any')
-    basedir = pkg_resources.resource_filename(package_name, '')
+    if package_name == "label_studio":
+        basedir = os.path.abspath(os.path.join(settings.BASE_DIR, "../"))
+    else:
+        basedir = pkg_resources.resource_filename(package_name, '')
+    
     node_path = os.path.join(*node_path.split('/'))  # linux to windows compatibility
     search_by_path = '/' in node_path or '\\' in node_path
 

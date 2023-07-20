@@ -65,7 +65,7 @@ def test_core_int_from_request(param, result):
 
 @pytest.mark.django_db
 def test_user_info(business_client):
-    from label_studio.server import _get_user_info, _create_user
+    from server import _get_user_info, _create_user
 
     user_data = _get_user_info(business_client.admin.email)
     assert 'token' in user_data
@@ -105,7 +105,7 @@ def test_main(mocker, command_line, result):
 
 
 def test_string_is_url():
-    from label_studio.core.utils.common import string_is_url
+    from core.utils.common import string_is_url
 
     assert string_is_url('http://test.com') is True
     assert string_is_url('https://test.com') is True
@@ -113,7 +113,7 @@ def test_string_is_url():
 
 
 def test_get_client_ip():
-    from label_studio.core.utils.common import get_client_ip
+    from core.utils.common import get_client_ip
 
     ip = get_client_ip(types.SimpleNamespace(META={'HTTP_X_FORWARDED_FOR': '127.0.0.1'}))
     assert ip == '127.0.0.1'
@@ -123,14 +123,14 @@ def test_get_client_ip():
 
 
 def test_timestamp_now():
-    from label_studio.core.utils.common import timestamp_now
+    from core.utils.common import timestamp_now
 
     t = timestamp_now()
     assert t is not None
 
 
 def test_start_browser():
-    from label_studio.core.utils.common import start_browser
+    from core.utils.common import start_browser
 
     assert start_browser('http://localhost:8080', True) is None
     assert start_browser('http://localhost:8080', False) is None

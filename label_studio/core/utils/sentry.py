@@ -58,6 +58,8 @@ def event_processor(event, hint):
 
 
 def init_sentry(release_name, release_version):
+    print(f"######## nebula mock func init_sentry ########")
+    return 
     if settings.SENTRY_DSN:
         import sentry_sdk
         from sentry_sdk.integrations.django import DjangoIntegration

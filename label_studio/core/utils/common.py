@@ -21,7 +21,7 @@ import contextlib
 
 from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
 
-import label_studio
+# import label_studio
 import re
 
 from django.db import models, transaction
@@ -86,7 +86,8 @@ def custom_exception_handler(exc, context):
     response_data = {
         'id': exception_id,
         'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,  # default value
-        'version': label_studio.__version__,
+        # 'version': label_studio.__version__,
+        'version': settings.NEBULA_VERSION,
         'detail': 'Unknown error',  # default value
         'exc_info': None,
     }
@@ -324,6 +325,7 @@ def retry_database_locked():
 
 
 def get_app_version():
+    return settings.NEBULA_VERSION
     version = pkg_resources.get_distribution('label-studio').version
     if isinstance(version, str):
         return version
@@ -334,7 +336,8 @@ def get_app_version():
 def get_latest_version():
     """ Get version from pypi
     """
-    pypi_url = 'https://pypi.org/pypi/%s/json' % label_studio.package_name
+    # pypi_url = 'https://pypi.org/pypi/%s/json' % label_studio.package_name
+    pypi_url = 'https://pypi.org/pypi/%s/json' % settings.NEBULA_PACKAGE_NAME
     try:
         response = requests.get(pypi_url, timeout=10).text
         data = json.loads(response)
@@ -348,13 +351,15 @@ def get_latest_version():
 
 def current_version_is_outdated(latest_version):
     latest_version = parse_version(latest_version)
-    current_version = parse_version(label_studio.__version__)
+    current_version = parse_version(settings.NEBULA_VERSION)
     return current_version < latest_version
 
 
 def check_for_the_latest_version(print_message):
     """ Check latest pypi version
     """
+    print('"######## nebula mock func check_for_the_latest_version "########')
+    return
     if not settings.LATEST_VERSION_CHECK:
         return
 
@@ -401,6 +406,8 @@ def collect_versions(force=False):
 
     :return: dict with sub-dicts of version descriptions
     """
+    print(f'"######## nebula mock func collect_versions settings.NEBULA_MOCK_RESULT "########')
+    return settings.NEBULA_MOCK_RESULT
     import label_studio
 
     # prevent excess checks by time intervals

@@ -46,6 +46,8 @@ class ContextLog(object):
         self.server_id = self._get_server_id()
 
     def _get_label_studio_env(self):
+        print('######## nebula mock func _get_label_studio_env ########')
+        return {}
         env = {}
         for env_key, env_value in os.environ.items():
             if env_key.startswith('LABEL_STUDIO_'):

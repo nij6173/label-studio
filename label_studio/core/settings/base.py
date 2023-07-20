@@ -15,7 +15,7 @@ import logging
 import json
 
 from datetime import timedelta
-from label_studio.core.utils.params import get_bool_env, get_env
+from core.utils.params import get_bool_env, get_env
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -27,7 +27,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'json': {
-            '()': 'label_studio.core.utils.formatter.CustomJsonFormatter',
+            '()': 'core.utils.formatter.CustomJsonFormatter',
             'format': '[%(asctime)s] [%(name)s::%(funcName)s::%(lineno)d] [%(levelname)s] [%(user_id)s] %(message)s',
             'datefmt': '%d/%b/%Y:%H:%M:%S %z',
         },
@@ -74,8 +74,8 @@ LOGGING = {
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 
-from label_studio.core.utils.io import get_data_dir
-from label_studio.core.utils.params import get_bool_env, get_env, get_env_list_int
+from core.utils.io import get_data_dir
+from core.utils.params import get_bool_env, get_env, get_env_list_int
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -102,7 +102,7 @@ if HOSTNAME:
             if FORCE_SCRIPT_NAME:
                 logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
 
-INTERNAL_PORT = '8080'
+INTERNAL_PORT = '8081'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
@@ -486,7 +486,42 @@ DATA_UNDEFINED_NAME = '$undefined$'
 LICENSE = {}
 VERSIONS = {}
 VERSION_EDITION = 'Community'
-LATEST_VERSION_CHECK = True
+LATEST_VERSION_CHECK = False
+NEBULA_VERSION = '1.8.0'
+NEBULA_PACKAGE_NAME = 'label-studio'
+NEBULA_MOCK_RESULT = {
+        'release': '1.8.0',
+        'label-studio-os-package': {
+            'version': '1.8.0',
+            'short_version': '1.8',
+            'latest_version_from_pypi': '1.8.0',
+            'latest_version_upload_time': '2023-06-05T23:14:45',
+            'current_version_is_outdated': False
+        },
+        'label-studio-os-backend': {
+            'message': 'fix: LSDV-5235: Use alternate check for postpone based on presence of  ...',
+            'commit': '181c997901d5e4ebfd53747b28ab5cb6537910d1',
+            'date': '2023/06/05 13:43:26',
+            'branch': '',
+            'version': '1.8.0+0.g181c997'
+        },
+        'label-studio-frontend': {
+            'message': 'fix: LSDV-5235: Use alternate check for postpone based on presence of  ...',
+            'commit': '640d531fa241470d7613b53abccade2c7467a94e',
+            'branch': 'ls-release/1.8.0',
+            'date': '2023/06/05 13:36:43'
+        },
+        'dm2': {
+            'message': 'fix: LSDV-5192: Change quick view icon and change hover color (#196)',
+            'commit': '6175d9dc27547a3a76a5809880f48774810d5bc2',
+            'branch': 'ls-release/1.8.0',
+            'date': '2023/06/02 08:52:09'
+        },
+        'label-studio-converter': {
+            'version': '0.0.53'
+        }
+    }
+
 VERSIONS_CHECK_TIME = 0
 ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
 CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)
