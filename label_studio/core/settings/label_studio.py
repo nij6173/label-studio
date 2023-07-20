@@ -3,6 +3,13 @@
 import os
 import pathlib
 
+try:
+    from .env import *
+    # print(f"#### os.environ {os.environ}")
+except Exception as e:
+    print(f"#### env settings error: {e}")
+    pass
+
 from core.settings.base import *
 
 DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
@@ -25,7 +32,6 @@ SESSION_COOKIE_SECURE = get_bool_env('SESSION_COOKIE_SECURE', False)
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
-RQ_QUEUES = {}
 
 SENTRY_DSN = get_env(
     'SENTRY_DSN',

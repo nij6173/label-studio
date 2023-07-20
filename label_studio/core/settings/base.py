@@ -17,6 +17,8 @@ import json
 from datetime import timedelta
 from core.utils.params import get_bool_env, get_env
 
+ENV = os.environ.get("ENV", "dev")
+
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
 if JSON_LOG:
@@ -156,6 +158,44 @@ DATABASES_ALL['default'] = DATABASES_ALL[DJANGO_DB_POSTGRESQL]
 DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# redis配置
+REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
+REDIS_USER = os.environ.get("REDIS_USER", "root")
+REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD", "")
+REDIS_CONNECTIONS = int(os.environ.get("REDIS_CONNECTIONS", 100))
+
+if ENV == "sit" or ENV == "prod":
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "CONNECTION_POOL_KWARGS": {"max_connections": REDIS_CONNECTIONS},
+                # "USERNAME": REDIS_USER,
+                # "PASSWORD": REDIS_PASSWORD,
+                }
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/2",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "CONNECTION_POOL_KWARGS": {"max_connections": REDIS_CONNECTIONS},
+                # "USERNAME": REDIS_USER,
+                # "PASSWORD": REDIS_PASSWORD,
+                }
+        }
+    }   
+
+REDIS_TIMEOUT = 7*24*60*60
+CUBES_REDIS_TIMEOUT = 60*60
+NEVER_REDIS_TIMEOUT = 365*24*60*60
 
 if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
     logging.info('Google Cloud Logging handler is enabled.')
@@ -359,10 +399,15 @@ GRAPHIQL = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+
+LANGUAGE_CODE = 'zh-Hans'
+
+TIME_ZONE = 'Asia/Shanghai'
+
 USE_I18N = False
+
 USE_L10N = True
+
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)

@@ -75,3 +75,5 @@ docker-compose.override.yml
 .viminfo
 .bash_history
 
+env.py
+
