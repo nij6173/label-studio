@@ -26,9 +26,16 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 
+import xadmin
+from xadmin.plugins import xversion
+
 from core import views
 from core.utils.static_serve import serve
 from core.utils.common import collect_versions
+
+
+xadmin.autodiscover()
+xversion.register_models()
 
 handler500 = 'core.views.custom_500'
 
@@ -88,7 +95,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
     path('feature-flags/', views.feature_flags, name='feature_flags'),
-    re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    path('xadmin/', xadmin.site.urls)
 ]
 
 if settings.DEBUG:
