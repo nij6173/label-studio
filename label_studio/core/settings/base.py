@@ -246,6 +246,9 @@ INSTALLED_APPS = [
     'ml',
     'webhooks',
     'labels_manager',
+    'xadmin',
+    'crispy_forms',
+    'reversion'
 ]
 
 MIDDLEWARE = [

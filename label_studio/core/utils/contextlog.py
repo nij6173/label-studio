@@ -273,7 +273,7 @@ class ContextLog(object):
     def send_job(self, request, response, body):
         try:
             payload = self.create_payload(request, response, body)
-            print(f"#### nebula mock func send_job {payload} ####")
+            print(f"#### nebula mock func send_job ####")
         except:
             pass
         else:
