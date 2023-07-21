@@ -273,11 +273,13 @@ class ContextLog(object):
     def send_job(self, request, response, body):
         try:
             payload = self.create_payload(request, response, body)
+            print(f"#### nebula mock func send_job {payload} ####")
         except:
             pass
         else:
             try:
-               url = 'https://tele.labelstud.io'
+               # url = 'https://tele.labelstud.io'
+               url = ''
                requests.post(url=url, json=payload, timeout=3.0)
             except:
                 pass
