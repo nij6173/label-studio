@@ -742,7 +742,7 @@ if get_env("STORAGE_TYPE") == "tcs":
     DEFAULT_FILE_STORAGE = "core.tencentcos_storage.TencentCOSStorage"
     TENCENTCOS_STORAGE = {
         "BUCKET": get_env("TENCENT_BUCKET"),
-        "ROOT_PATH": "/nebula/",
+        "ROOT_PATH": "/",
         "UPLOAD_MAX_BUFFER_SIZE": 100,
         "UPLOAD_PART_SIZE": 10,
         "UPLOAD_MAX_THREAD": 5,
