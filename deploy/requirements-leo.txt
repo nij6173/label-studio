@@ -64,7 +64,6 @@ python-json-logger==2.0.4
 
 label-studio-converter==0.0.54rc0
 
-django-tencentcos-storage==0.2.0
 redis==4.5.4
 django-redis==5.2.0
 celery==5.2.7

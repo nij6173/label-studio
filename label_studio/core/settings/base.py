@@ -246,9 +246,11 @@ INSTALLED_APPS = [
     'ml',
     'webhooks',
     'labels_manager',
+
     'xadmin',
     'crispy_forms',
-    'reversion'
+    'reversion',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -737,7 +739,7 @@ GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FO
 
 if get_env("STORAGE_TYPE") == "tcs":
     CLOUD_FILE_STORAGE_ENABLED = True
-    DEFAULT_FILE_STORAGE = "tencentcos_storage.TencentCOSStorage"
+    DEFAULT_FILE_STORAGE = "core.tencentcos_storage.TencentCOSStorage"
     TENCENTCOS_STORAGE = {
         "BUCKET": get_env("TENCENT_BUCKET"),
         "ROOT_PATH": "/nebula/",
