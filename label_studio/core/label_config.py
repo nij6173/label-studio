@@ -15,9 +15,13 @@ import defusedxml.ElementTree as etree
 from collections import defaultdict
 from django.conf import settings
 from core.utils.io import find_file
+from core.utils.params import get_env
 from core.utils.exceptions import (
     LabelStudioValidationErrorSentryIgnored, LabelStudioXMLSyntaxErrorSentryIgnored
 )
+if get_env("STORAGE_TYPE") == "tcs":
+    from core.tencentcos_storage import TencentCOSStorage
+    storage_backend = TencentCOSStorage()
 from label_studio_tools.core import label_config
 
 logger = logging.getLogger(__name__)
@@ -409,6 +413,15 @@ def replace_task_data_undefined_with_config_field(data, project, first_key=None)
         key = first_key or list(project.data_types.keys())[0]
         data[key] = data[settings.DATA_UNDEFINED_NAME]
         del data[settings.DATA_UNDEFINED_NAME]
+
+def check_task_data_for_cloud_file_storage(data):
+    """
+    """
+    if get_env("STORAGE_TYPE") == "tcs":
+        for k,v in data.items():
+            if v.startswith(settings.TENCENTCOS_STORAGE.get("ROOT_PATH", "/")):
+                data[k] = storage_backend.presigned_url(v)
+    return data
 
 
 def check_control_in_config_by_regex(config_string, control_type, filter=None):

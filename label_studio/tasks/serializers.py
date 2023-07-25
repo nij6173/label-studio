@@ -19,7 +19,7 @@ from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
 from tasks.exceptions import AnnotationDuplicateError
 from core.utils.common import retry_database_locked
-from core.label_config import replace_task_data_undefined_with_config_field
+from core.label_config import replace_task_data_undefined_with_config_field, check_task_data_for_cloud_file_storage
 from users.serializers import UserSerializer
 from users.models import User
 from core.utils.common import load_func
@@ -117,6 +117,7 @@ class TaskSimpleSerializer(ModelSerializer):
             # resolve $undefined$ key in task data
             data = instance.data
             replace_task_data_undefined_with_config_field(data, project)
+            check_task_data_for_cloud_file_storage(data)
 
         return super().to_representation(instance)
 
@@ -157,6 +158,7 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
             # resolve $undefined$ key in task data
             data = instance.data
             replace_task_data_undefined_with_config_field(data, project)
+            check_task_data_for_cloud_file_storage(data)
 
         return super().to_representation(instance)
 

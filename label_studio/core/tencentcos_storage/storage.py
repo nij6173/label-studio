@@ -113,6 +113,19 @@ class TencentCOSStorage(Storage):
             bucket=self.bucket, path=self._full_path(name)
         )
 
+    def presigned_url(self, name):
+        res = self.client.get_presigned_url(
+            Method="GET",
+            Bucket=self.bucket,
+            Key=self._full_path(name),
+            SignHost=False,
+            # Params={
+            #     'x-cos-security-token': 'tmp secret token'
+            # }
+            Expired=120
+        )
+        return res
+
     def _open(self, name, mode="rb"):
         return TencentCOSFile(self._full_path(name), self)
 
