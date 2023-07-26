@@ -406,7 +406,9 @@ def collect_versions(force=False):
 
     :return: dict with sub-dicts of version descriptions
     """
-    print(f'######## nebula mock func collect_versions settings.NEBULA_MOCK_RESULT ########')
+    print('######## nebula mock func collect_versions settings.NEBULA_MOCK_RESULT ########')
+    if type(settings.NEBULA_MOCK_RESULT) == str:
+        return json.loads(settings.NEBULA_MOCK_RESULT)
     return settings.NEBULA_MOCK_RESULT
     import label_studio
 
