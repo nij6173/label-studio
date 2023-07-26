@@ -21,10 +21,10 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LS_DIR=/label-studio \
-    PIP_CACHE_DIR=$HOME/.cache \
+    # PIP_CACHE_DIR=$HOME/.cache \
     DJANGO_SETTINGS_MODULE=core.settings.label_studio \
-    LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
-    OPT_DIR=/opt/heartex/instance-data/etc \
+    # LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
+    # OPT_DIR=/opt/heartex/instance-data/etc \
     SETUPTOOLS_USE_DISTUTILS=stdlib
 
 WORKDIR $LS_DIR
@@ -38,8 +38,9 @@ RUN set -eux \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop
+# RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+#     pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop
+RUN pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop 
 
 # incapsulate nginx install & configure to a single layer
 RUN set -eux; \
@@ -58,17 +59,19 @@ RUN set -eux; \
 
 # Copy and install middleware dependencies
 COPY --chown=1001:0 deploy/requirements-mw.txt .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements-mw.txt
+# RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+#     pip3 install -r requirements-mw.txt
+RUN pip3 install -r requirements-mw.txt
 
 # Copy and install requirements.txt first for caching
-COPY --chown=1001:0 deploy/requirements.txt .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements.txt
+COPY --chown=1001:0 deploy/requirements-leo.txt .
+# RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+#     pip3 install -r requirements.txt
+RUN pip3 install -r requirements-leo.txt
 
 COPY --chown=1001:0 . .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -e . && \
+# RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+RUN pip3 install -e . && \
     chown -R 1001:0 $LS_DIR && \
     chmod -R g=u $LS_DIR
 
@@ -81,9 +84,10 @@ RUN python3 label_studio/manage.py collectstatic --no-input && \
 
 ENV HOME=/label-studio
 
-EXPOSE 8080
+EXPOSE 8000
 
 USER 1001
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
-CMD ["label-studio"]
+# CMD ["label-studio"]
+CMD ["label-studio-uwsgi"]
