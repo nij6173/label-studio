@@ -5,6 +5,8 @@ import pathlib
 
 try:
     from .env import *
+    os.environ.setdefault('LABEL_STUDIO_fflag_fix_back_lsdv_4568_import_csv_links_03032023_short', 'True')
+    os.environ.setdefault('HEARTEX_fflag_fix_back_lsdv_4568_import_csv_links_03032023_short', 'True')
     # print(f"#### os.environ {os.environ}")
 except Exception as e:
     print(f"#### env settings error: {e}")

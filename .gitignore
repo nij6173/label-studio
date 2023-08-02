@@ -76,4 +76,5 @@ docker-compose.override.yml
 .bash_history
 
 env.py
+config_map.yaml
 
