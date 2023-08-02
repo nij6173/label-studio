@@ -40,7 +40,7 @@ RUN set -eux \
 
 # RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
 #     pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop
-RUN pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/simple
+RUN pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop
 
 # incapsulate nginx install & configure to a single layer
 RUN set -eux; \
@@ -61,13 +61,13 @@ RUN set -eux; \
 COPY --chown=1001:0 deploy/requirements-mw.txt .
 # RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
 #     pip3 install -r requirements-mw.txt
-RUN pip3 install -r requirements-mw.txt -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/simple
+RUN pip3 install -r requirements-mw.txt
 
 # Copy and install requirements.txt first for caching
 COPY --chown=1001:0 deploy/requirements-leo.txt .
 # RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
 #     pip3 install -r requirements.txt
-RUN pip3 install -r requirements-leo.txt -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/simple
+RUN pip3 install -r requirements-leo.txt
 
 COPY --chown=1001:0 . .
 # RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
