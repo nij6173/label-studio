@@ -14,10 +14,15 @@ from colorama import init, Fore
 if sys.platform == 'win32':
     init(convert=True)
 
-# on windows there will be problems with sqlite and json1 support, so fix it
-from core.utils.windows_sqlite_fix import windows_dll_fix
+# # on windows there will be problems with sqlite and json1 support, so fix it
+# from core.utils.windows_sqlite_fix import windows_dll_fix
 
-windows_dll_fix()
+# windows_dll_fix()
+import sys
+print(f"-----sys.path")
+print(f"-----{sys.path}")
+print(f"-----os.listdir")
+print(f"-----{os.listdir()}")
 
 from django.core.management import call_command
 from django.core.wsgi import get_wsgi_application
