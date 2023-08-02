@@ -71,7 +71,7 @@ if [ "$1" = "nginx" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/nginx/"
   exec nginx -c $OPT_DIR/nginx/nginx.conf -e /dev/stderr
 elif [ "$1" = "label-studio-uwsgi" ]; then
-  exec_entrypoint "$ENTRYPOINT_PATH/app/"
+  # exec_entrypoint "$ENTRYPOINT_PATH/app/"
   exec_or_wrap_n_exec uwsgi --ini /label-studio/deploy/uwsgi.ini
 elif [ "$1" = "label-studio-migrate" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/app-init/"
