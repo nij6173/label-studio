@@ -24,7 +24,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     # PIP_CACHE_DIR=$HOME/.cache \
     DJANGO_SETTINGS_MODULE=core.settings.label_studio \
     # LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
-    # OPT_DIR=/opt/heartex/instance-data/etc \
+    OPT_DIR=/opt/heartex/instance-data/etc \
     SETUPTOOLS_USE_DISTUTILS=stdlib
 
 WORKDIR $LS_DIR
