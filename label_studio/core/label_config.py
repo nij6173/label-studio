@@ -419,8 +419,9 @@ def check_task_data_for_cloud_file_storage(data):
     """
     if get_env("STORAGE_TYPE") == "tcs":
         for k,v in data.items():
-            if v.startswith(settings.TENCENTCOS_STORAGE.get("ROOT_PATH", "/")) or v.startswith("/") or v.startswith("data/") or v.startswith("pred/") or v.startswith("anno/"):
-                data[k] = storage_backend.presigned_url(v)
+            if type(v) == str:
+                if v.startswith(settings.TENCENTCOS_STORAGE.get("ROOT_PATH", "/")) or v.startswith("/") or v.startswith("data/") or v.startswith("pred/") or v.startswith("anno/"):
+                    data[k] = storage_backend.presigned_url(v)
     return data
 
 
