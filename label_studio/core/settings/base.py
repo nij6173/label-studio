@@ -104,7 +104,7 @@ if HOSTNAME:
             if FORCE_SCRIPT_NAME:
                 logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
 
-INTERNAL_PORT = '8081'
+INTERNAL_PORT = '8080'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
@@ -540,41 +540,41 @@ LATEST_VERSION_CHECK = False
 
 NEBULA_VERSION = get_env("NEBULA_VERSION", "0.1")
 NEBULA_PACKAGE_NAME = get_env("NEBULA_PACKAGE_NAME", "nebula")
-NEBULA_MOCK_RESULT = get_env("NEBULA_MOCK_RESULT", "{}")
+# NEBULA_MOCK_RESULT = get_env("NEBULA_MOCK_RESULT", "{}")
 # NEBULA_VERSION = '1.8.0'
 # NEBULA_PACKAGE_NAME = ''
-# NEBULA_MOCK_RESULT = {
-#         'release': '1.8.0',
-#         'label-studio-os-package': {
-#             'version': '1.8.0',
-#             'short_version': '1.8',
-#             'latest_version_from_pypi': '1.8.0',
-#             'latest_version_upload_time': '2023-06-05T23:14:45',
-#             'current_version_is_outdated': False
-#         },
-#         'label-studio-os-backend': {
-#             'message': 'fix: LSDV-5235: Use alternate check for postpone based on presence of  ...',
-#             'commit': '181c997901d5e4ebfd53747b28ab5cb6537910d1',
-#             'date': '2023/06/05 13:43:26',
-#             'branch': '',
-#             'version': '1.8.0+0.g181c997'
-#         },
-#         'label-studio-frontend': {
-#             'message': 'fix: LSDV-5235: Use alternate check for postpone based on presence of  ...',
-#             'commit': '640d531fa241470d7613b53abccade2c7467a94e',
-#             'branch': 'ls-release/1.8.0',
-#             'date': '2023/06/05 13:36:43'
-#         },
-#         'dm2': {
-#             'message': 'fix: LSDV-5192: Change quick view icon and change hover color (#196)',
-#             'commit': '6175d9dc27547a3a76a5809880f48774810d5bc2',
-#             'branch': 'ls-release/1.8.0',
-#             'date': '2023/06/02 08:52:09'
-#         },
-#         'label-studio-converter': {
-#             'version': '0.0.53'
-#         }
-#     }
+NEBULA_MOCK_RESULT = {
+        'release': '1.8.0',
+        'label-studio-os-package': {
+            'version': '1.8.0',
+            'short_version': '1.8',
+            'latest_version_from_pypi': '1.8.0',
+            'latest_version_upload_time': '2023-06-05T23:14:45',
+            'current_version_is_outdated': False
+        },
+        'label-studio-os-backend': {
+            'message': 'fix: LSDV-5235: Use alternate check for postpone based on presence of  ...',
+            'commit': '181c997901d5e4ebfd53747b28ab5cb6537910d1',
+            'date': '2023/06/05 13:43:26',
+            'branch': '',
+            'version': '1.8.0+0.g181c997'
+        },
+        'label-studio-frontend': {
+            'message': 'fix: LSDV-5235: Use alternate check for postpone based on presence of  ...',
+            'commit': '640d531fa241470d7613b53abccade2c7467a94e',
+            'branch': 'ls-release/1.8.0',
+            'date': '2023/06/05 13:36:43'
+        },
+        'dm2': {
+            'message': 'fix: LSDV-5192: Change quick view icon and change hover color (#196)',
+            'commit': '6175d9dc27547a3a76a5809880f48774810d5bc2',
+            'branch': 'ls-release/1.8.0',
+            'date': '2023/06/02 08:52:09'
+        },
+        'label-studio-converter': {
+            'version': '0.0.53'
+        }
+    }
 
 VERSIONS_CHECK_TIME = 0
 ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
