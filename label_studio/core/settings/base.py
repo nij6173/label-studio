@@ -174,8 +174,8 @@ if ENV == "sit" or ENV == "prod":
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
                 "CONNECTION_POOL_KWARGS": {"max_connections": REDIS_CONNECTIONS},
-                # "USERNAME": REDIS_USER,
-                # "PASSWORD": REDIS_PASSWORD,
+                "USERNAME": REDIS_USER,
+                "PASSWORD": REDIS_PASSWORD,
                 }
         }
     }
@@ -187,8 +187,8 @@ else:
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
                 "CONNECTION_POOL_KWARGS": {"max_connections": REDIS_CONNECTIONS},
-                # "USERNAME": REDIS_USER,
-                # "PASSWORD": REDIS_PASSWORD,
+                "USERNAME": REDIS_USER,
+                "PASSWORD": REDIS_PASSWORD,
                 }
         }
     }   
