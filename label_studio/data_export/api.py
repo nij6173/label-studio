@@ -14,11 +14,13 @@ from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from rest_framework import status, generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.views import APIView
 from urllib.parse import urlparse
 
+from core.api_permissions import HasObjectPermission, EmailWhiteListPermission
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.feature_flags import flag_set
@@ -149,6 +151,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
 )
 class ExportAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
+    permission_classes = (IsAuthenticated, HasObjectPermission, EmailWhiteListPermission)
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
