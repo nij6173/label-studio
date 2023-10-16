@@ -17,12 +17,15 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+
 from urllib.parse import urlparse
 
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.feature_flags import flag_set
 from core.utils.common import batch
+from core.api_permissions import HasObjectPermission, EmailWhiteListPermission
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export, ConvertedFormat
@@ -149,6 +152,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
 )
 class ExportAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
+    permission_classes = (IsAuthenticated, HasObjectPermission, EmailWhiteListPermission)
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
@@ -157,6 +161,7 @@ class ExportAPI(generics.RetrieveAPIView):
         return queryset.select_related('project').prefetch_related('annotations', 'predictions')
 
     def get(self, request, *args, **kwargs):
+
         project = self.get_object()
         query_serializer = ExportParamSerializer(data=request.GET)
         query_serializer.is_valid(raise_exception=True)
