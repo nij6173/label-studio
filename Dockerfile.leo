@@ -66,7 +66,7 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
 # Copy and install requirements.txt first for caching
 COPY --chown=1001:0 deploy/requirements-leo.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements-leo.txt
+    pip3 install -r requirements-leo.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 # RUN pip3 install -r requirements-leo.txt
 
 COPY --chown=1001:0 . .
