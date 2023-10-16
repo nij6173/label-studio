@@ -71,7 +71,7 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
 
 COPY --chown=1001:0 . .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -e . && \
+    pip3 install -e . -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com && \
     chown -R 1001:0 $LS_DIR && \
     chmod -R g=u $LS_DIR
 
