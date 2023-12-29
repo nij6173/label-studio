@@ -3,8 +3,14 @@ import './utils/service-worker';
 
 /**
  * JS HOOK
- * 全局支持 解析 Latex 公示并显示
- * 支持 RichText 内的 代码块显示/高亮
+ * 1. 全局支持 解析 Latex 公示并显示
+ * 2. 支持 RichText 内的 代码块显示/高亮，
+ * 3. 全局支持 解析 Latex inline公式并显示
+ * 4. 支持Paragraph/Textarea的自动换行，缩进，空格...
+ * 5. 支持Paragraph/Textarea 内的 代码块显示/高亮
+ *
+ *
+ *
  * 需要关闭Content-Security-Policy [非本地dev环境就可以]
  *
  * External resources:
@@ -31,6 +37,7 @@ import './utils/service-worker';
 
 
     /**
+     * 用于处理Ricktext中的代码块
      * 将多行的<span>包含的代码块提取并渲染
      * 不会立刻移除垃圾，等待最后一起处理
      * * @param found
@@ -40,6 +47,7 @@ import './utils/service-worker';
         for (let j = 0; j < found.length; ++j) {
             codeBlock = codeBlock + found[j].textContent + "\n"
         }
+        //将除了第一行以外的全部行标记为垃圾（包括换行符）
         for (let j = 1; j < found.length; ++j) {
             var nextElement = found[j].nextElementSibling;
             if (nextElement && nextElement.tagName === 'BR') {
@@ -49,11 +57,9 @@ import './utils/service-worker';
         }
 
         //使用第一行作为container
-        found[0].innerHtml = ""
         found[0].innerText = ""
-        console.log("Identify a code block: ")
-        console.log(codeBlock)
-        //从codeBlock建立Html格式codeBlock
+        found[0].innerHTML = ""
+        //从codeBlock建立HTML格式codeBlock
         let html = marked.parse(codeBlock)
         //将Html转为element
         let code = createElementFromHTML(html);
@@ -62,9 +68,15 @@ import './utils/service-worker';
         //增加行号, 不是很好看
         //hljs.lineNumbersBlock(code)
         //插入0
+        //去掉背景
+        code.style.background = 'none';
         found[0].appendChild(code)
     }
 
+    /**
+     * 处理Richtext中的代码块/Markdown
+     * @param ele
+     */
     function processRichtext(ele) {
         //不重复处理
         if (ele.className.includes("__processed_rich_text")) {
@@ -74,14 +86,13 @@ import './utils/service-worker';
 
         //滑动窗口找code blocks
         let lines = ele.getElementsByClassName("lsf-richtext__line")
-        if (lines.length === 0 || lines.length === 1) {
+        if (lines.length === 0) {
             return
         }
         let found = []
 
         for (let i = 0; i < lines.length; ++i) {
             let line = lines[i]
-            console.log(line.innerText)
 
             //contains a math symbol
             if (line.getElementsByTagName("mjx-container").length > 0) {
@@ -105,17 +116,85 @@ import './utils/service-worker';
 
             if (found.length > 0) {
                 found.push(line)
+            } else {
+                //没有匹配到Code的情况下，匹配是不是可能是Markdown content
+                if (
+                    line.textContent.includes("#") ||
+                    line.textContent.includes("*")
+                ) {
+                    line.innerHTML = makred.parse(line.textContent)
+                }
             }
         }
 
         //如果需要结尾默认带一个···的话，在这里flush一次(check-non-empty)
 
+
         //删除垃圾
         let trashs = ele.getElementsByClassName("__trash_rich_text_line")
-        for(let i = trashs.length - 1; i >= 0; --i){
+        for (let i = trashs.length - 1; i >= 0; --i) {
             trashs[i].remove()
         }
+    }
 
+    /**
+     * 处理某个Container下的无序spans
+     * Markdown格式 /
+     */
+    function processSpansUnder(ele) {
+        let spans = ele.getElementsByTagName("span")
+        let markdownSpans = [];
+
+        for (let i = 0; i < spans.length; ++i) {
+            let span = spans[i]
+            if (span.className.includes("__markdown_span")) {
+                continue;
+            }
+            if (span.getAttribute("role") === "img") {
+                continue;
+            }
+            if (span.getAttribute("data-skip-node") == "true") {
+                continue;
+            }
+            //console.log(span)
+            //console.log(marked.parse(span.textContent))
+            //暴力parse
+            span.innerHTML = marked.parse(span.textContent)
+
+            //标记为已处理
+            span.classList.add("__markdown_span")
+            //等待二次处理
+            markdownSpans.push(span)
+        }
+
+        for (let i = 0; i < markdownSpans.length; ++i) {
+            let span = markdownSpans[i]
+
+            //处理markdown中的全部代码块
+            span.querySelectorAll('pre code').forEach((el) => {
+                //高亮
+                hljs.highlightElement(el);
+                //去掉背景
+                el.style.background = 'none';
+            });
+
+            //p转为pre, <pre>可以显示全部的空格/换行
+            var pElements = span.getElementsByTagName('p');
+            //锁一下瀑布流list
+            var pElementsArray = Array.prototype.slice.call(pElements);
+            pElementsArray.forEach(function (p) {
+                var pre = document.createElement('pre');
+                pre.innerHTML = p.innerHTML;
+                p.parentNode.replaceChild(pre, p);
+            });
+
+            //同时将处理后的span内的所有span标记为已处理
+            let inner = span.getElementsByTagName("span");
+            for (let j = 0; j < inner.length; ++j) {
+                let inner_span = inner[j];
+                inner_span.classList.add("__markdown_span")
+            }
+        }
     }
 
     //核心TICK
@@ -125,7 +204,7 @@ import './utils/service-worker';
             return
         }
         clearInterval(interval)
-        //每250ms扫一次
+        //每333ms扫一次
         setInterval(function () {
             MathJax.typeset()//内部逻辑自动跳过已处理的
             let all_richtext = document.getElementsByClassName("lsf-htx-richtext")
@@ -133,7 +212,17 @@ import './utils/service-worker';
                 let richtext = all_richtext[i];
                 processRichtext(richtext)
             }
-        }, 250)
+            let all_paragrpahs = document.getElementsByClassName("lsf-paragraphs")
+            for (let i = 0; i < all_paragrpahs.length; ++i) {
+                let paragraphs = all_paragrpahs[i];
+                processSpansUnder(paragraphs)
+            }
+            let all_text_areas = document.getElementsByClassName("lsf-text-area")
+            for (let i = 0; i < all_text_areas.length; ++i) {
+                let text_area = all_text_areas[i];
+                processSpansUnder(text_area)
+            }
+        }, 333)
     }, 100)
 
     function loadMarked() {
@@ -152,6 +241,17 @@ import './utils/service-worker';
         script.type = 'text/javascript';
         script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
         document.head.appendChild(script);
+
+        //inline math displayer
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']]//匹配并且更新inline的'$xxx$'
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+
         script.onload = function () {
             mathjax = true
             console.log("Loaded Latex formatter from jsdelivr")
@@ -176,7 +276,6 @@ import './utils/service-worker';
             highlight = true;
             linenumber = true;
             console.log("Loaded code highlighter from cloudflare")
-
             /*
 
             let script = document.createElement('script');
@@ -199,4 +298,3 @@ import './utils/service-worker';
     loadMathJax();
     loadMarked()
 })();
-
