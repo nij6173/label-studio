@@ -9,7 +9,27 @@ from core.feature_flags import flag_set
 from data_manager.prepare_params import ConjunctionEnum
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.postgres.fields.jsonb import KeyTextTransform
+try:
+    from django.contrib.postgres.fields.jsonb import KeyTextTransform
+except ImportError:
+    try:
+        # For Django 4.2+, KeyTextTransform has been moved
+        from django.contrib.postgres.fields import KeyTextTransform
+    except ImportError:
+        # For newer Django versions, use the generic Transform
+        from django.db.models import Transform
+        
+        class KeyTextTransform(Transform):
+            """Custom KeyTextTransform for newer Django versions"""
+            lookup_name = 'key_text_transform'
+            
+            def __init__(self, key_name, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.key_name = key_name
+            
+            def as_sql(self, compiler, connection):
+                lhs, params = compiler.compile(self.lhs)
+                return f"({lhs} ->> %s)", params + [self.key_name]
 from django.db import models
 from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, Value, When
 from django.db.models.functions import Cast, Coalesce

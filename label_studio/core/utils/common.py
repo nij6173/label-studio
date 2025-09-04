@@ -363,11 +363,19 @@ def retry_database_locked():
 
 
 def get_app_version():
-    version = pkg_resources.get_distribution('label-studio').version
-    if isinstance(version, str):
-        return version
-    elif isinstance(version, dict):
-        return version.get('version') or version.get('latest_version')
+    try:
+        version = pkg_resources.get_distribution('label-studio').version
+        if isinstance(version, str):
+            return version
+        elif isinstance(version, dict):
+            return version.get('version') or version.get('latest_version')
+    except (pkg_resources.DistributionNotFound, Exception):
+        # Fallback to version from __init__.py for development environment
+        try:
+            import label_studio
+            return label_studio.__version__
+        except:
+            return '1.20.0'
 
 
 def get_latest_version():
@@ -747,3 +755,19 @@ def empty(*args, **kwargs):
 def get_ttl_hash(seconds: int = 60) -> int:
     """Return the same value within `seconds` time period"""
     return round(time.time() / seconds)
+
+
+def is_community():
+    """Determine if the current Label Studio instance is the community edition (aka LSO).
+
+    Returns
+    -------
+    bool
+        True if running open-source Label Studio, False otherwise.
+    """
+    try:
+        import label_studio_enterprise  # noqa: F401
+
+        return False
+    except ImportError:
+        return True

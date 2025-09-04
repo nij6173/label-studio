@@ -6,7 +6,10 @@ import importlib.metadata
 package_name = 'label-studio'
 
 # Package version
-__version__ = '1.10.1dev'
+try:
+    __version__ = importlib.metadata.metadata(package_name).get('version')
+except importlib.metadata.PackageNotFoundError:
+    __version__ = '1.20.0'
 
 
 # pypi info

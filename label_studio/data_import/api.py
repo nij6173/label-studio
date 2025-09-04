@@ -131,7 +131,7 @@ task_create_response_scheme = {
 
             There are three possible ways to import tasks with this endpoint:
 
-            ### 1\. **POST with data**
+            ### 1\\. **POST with data**
             Send JSON tasks as POST data. Only JSON is supported for POSTing files directly.
             Update this example to specify your authorization token and Label Studio instance host, then run the following from
             the command line.
@@ -141,7 +141,7 @@ task_create_response_scheme = {
             -X POST '{host}/api/projects/1/import' --data '[{{"text": "Some text 1"}}, {{"text": "Some text 2"}}]'
             ```
 
-            ### 2\. **POST with files**
+            ### 2\\. **POST with files**
             Send tasks as files. You can attach multiple files with different names.
 
             - **JSON**: text files in JavaScript object notation format
@@ -157,7 +157,7 @@ task_create_response_scheme = {
             -X POST '{host}/api/projects/1/import' -F ‘file=@path/to/my_file.csv’
             ```
 
-            ### 3\. **POST with URL**
+            ### 3\\. **POST with URL**
             You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
 
             ```bash
@@ -600,7 +600,7 @@ class UploadedFileResponse(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
     @override_report_only_csp
-    @csp(SANDBOX=[])
+    @csp({'sandbox': []})
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         request = self.request

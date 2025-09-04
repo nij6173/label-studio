@@ -463,8 +463,8 @@ class Task(TaskMixin, models.Model):
         Task.delete_tasks_without_signals(queryset)
 
 
-pre_bulk_create = Signal(providing_args=['objs', 'batch_size'])
-post_bulk_create = Signal(providing_args=['objs', 'batch_size'])
+pre_bulk_create = Signal()
+post_bulk_create = Signal()
 
 
 class AnnotationManager(models.Manager):
@@ -1113,3 +1113,135 @@ def bulk_update_stats_project_tasks(tasks, project=None):
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & Q(annotations__result__isnull=False)
+
+
+class FailedPrediction(models.Model):
+    """
+    Class for storing failed prediction(s) for a task
+    """
+
+    message = models.TextField(
+        _('message'),
+        default=None,
+        blank=True,
+        null=True,
+        help_text='The message explaining why generating this prediction failed',
+    )
+    error_type = models.CharField(
+        _('error_type'),
+        max_length=512,
+        default=None,
+        null=True,
+        help_text='The type of error that caused prediction to fail',
+    )
+    ml_backend_model = models.ForeignKey(
+        'ml.MLBackend',
+        on_delete=models.SET_NULL,
+        related_name='failed_predictions',
+        null=True,
+        help_text='An ML Backend instance that created the failed prediction.',
+    )
+    model_version = models.TextField(
+        _('model version'),
+        default=None,
+        blank=True,
+        null=True,
+        help_text='A string value that for model version that produced the failed prediction. Used in both live models and when uploading offline predictions.',
+    )
+    model_run = models.ForeignKey(
+        'ml_models.ModelRun',
+        on_delete=models.CASCADE,
+        related_name='failed_predictions',
+        null=True,
+        help_text='A run of a ModelVersion that created the failed prediction.',
+    )
+    project = models.ForeignKey(
+        'projects.Project', on_delete=models.CASCADE, related_name='failed_predictions', null=True
+    )
+    task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='failed_predictions')
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+
+    class Meta:
+        db_table = 'failed_prediction'
+        verbose_name = _('Failed Prediction')
+        verbose_name_plural = _('Failed Predictions')
+
+
+class PredictionMeta(models.Model):
+    prediction = models.OneToOneField(
+        'Prediction',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='meta',
+        help_text=_('Reference to the associated prediction'),
+    )
+    failed_prediction = models.OneToOneField(
+        'FailedPrediction',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='meta',
+        help_text=_('Reference to the associated failed prediction'),
+    )
+    inference_time = models.FloatField(
+        _('inference time'), null=True, blank=True, help_text=_('Time taken for inference in seconds')
+    )
+    prompt_tokens_count = models.IntegerField(
+        _('prompt tokens count'), null=True, blank=True, help_text=_('Number of tokens in the prompt')
+    )
+    completion_tokens_count = models.IntegerField(
+        _('completion tokens count'), null=True, blank=True, help_text=_('Number of tokens in the completion')
+    )
+    total_tokens_count = models.IntegerField(
+        _('total tokens count'), null=True, blank=True, help_text=_('Total number of tokens')
+    )
+    prompt_cost = models.FloatField(_('prompt cost'), null=True, blank=True, help_text=_('Cost of the prompt'))
+    completion_cost = models.FloatField(
+        _('completion cost'), null=True, blank=True, help_text=_('Cost of the completion')
+    )
+    total_cost = models.FloatField(_('total cost'), null=True, blank=True, help_text=_('Total cost'))
+    extra = models.JSONField(_('extra'), null=True, blank=True, help_text=_('Additional metadata in JSON format'))
+
+    @classmethod
+    def create_no_commit(cls, data, prediction):
+        """
+        Creates a PredictionMeta object from the given result data, without committing it to the database.
+        or returns None if it fails.
+        """
+        try:
+            prediction_meta = PredictionMeta(
+                total_cost=data.get('total_cost_usd'),
+                prompt_cost=data.get('prompt_cost_usd'),
+                completion_cost=data.get('completion_cost_usd'),
+                prompt_tokens_count=data.get('prompt_tokens'),
+                completion_tokens_count=data.get('completion_tokens'),
+                total_tokens_count=data.get('prompt_tokens', 0) + data.get('completion_tokens', 0),
+                inference_time=data.get('inference_time'),
+                extra={
+                    'message_counts': data.get('message_counts', {}),
+                },
+            )
+            if hasattr(prediction, 'result'):  # Regular Prediction
+                prediction_meta.prediction = prediction
+            else:  # FailedPrediction
+                prediction_meta.failed_prediction = prediction
+            return prediction_meta
+        except Exception as exc:
+            logger.error(f'Error creating prediction meta with {data}: {exc}')
+            return None
+
+    class Meta:
+        db_table = 'prediction_meta'
+        verbose_name = _('Prediction Meta')
+        verbose_name_plural = _('Prediction Metas')
+        constraints = [
+            models.CheckConstraint(
+                # either prediction or failed_prediction should be not null
+                check=(
+                    (Q(prediction__isnull=False) & Q(failed_prediction__isnull=True))
+                    | (Q(prediction__isnull=True) & Q(failed_prediction__isnull=False))
+                ),
+                name='prediction_or_failed_prediction_not_null',
+            )
+        ]

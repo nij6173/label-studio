@@ -28,7 +28,7 @@ SESSION_COOKIE_SECURE = get_bool_env('SESSION_COOKIE_SECURE', False)
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
-RQ_QUEUES = {}
+# RQ_QUEUES configuration is inherited from base.py
 
 SENTRY_DSN = get_env('SENTRY_DSN', 'https://68b045ab408a4d32a910d339be8591a4@o227124.ingest.sentry.io/5820521')
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'opensource')
@@ -56,12 +56,7 @@ FEATURE_FLAGS_DEFAULT_VALUE = True
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 
 FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
-FEATURE_FLAGS_FROM_FILE = True
-try:
-    from core.utils.io import find_node
-
-    find_node('label_studio', FEATURE_FLAGS_FILE, 'file')
-except IOError:
-    FEATURE_FLAGS_FROM_FILE = False
+# Disable file-based feature flags to avoid compatibility issues
+FEATURE_FLAGS_FROM_FILE = False
 
 STORAGE_PERSISTENCE = get_bool_env('STORAGE_PERSISTENCE', True)

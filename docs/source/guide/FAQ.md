@@ -116,12 +116,12 @@ To prevent the HTML files from being minified, you can use a different import me
 If you want to correct existing annotations, you can minify your source HTML files in the same way that Label Studio does. The minification is performed with the following script:
 
 ```python
-import htmlmin
+import minify_html
 
 with open("sample.html", "r") as f:
-html_doc = f.read()
+    html_doc = f.read()
 
-minified_html_doc = htmlmin.minify(html_doc, remove_all_empty_space=True)
+minified_html_doc = minify_html.minify(html_doc, minify_css=True, minify_js=True)
 ```
 
 If minification does not seem to be affecting the offset placements, complex CSS or other reasons could be the cause. 

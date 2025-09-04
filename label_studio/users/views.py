@@ -10,7 +10,11 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render, reverse
-from django.utils.http import is_safe_url
+try:
+    from django.utils.http import is_safe_url
+except ImportError:
+    # Django 4.0+ renamed is_safe_url to url_has_allowed_host_and_scheme
+    from django.utils.http import url_has_allowed_host_and_scheme as is_safe_url
 from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
 from rest_framework.authtoken.models import Token

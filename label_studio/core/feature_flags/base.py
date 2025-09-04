@@ -6,6 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from ldclient.config import Config, HTTPConfig
 from ldclient.feature_store import CacheConfig
 from ldclient.integrations import Files, Redis
+from ldclient import Context
 
 from label_studio.core.current_request import get_current_request
 from label_studio.core.utils.io import find_node
@@ -60,16 +61,36 @@ else:
 
 
 def _get_user_repr(user):
-    """Turn user object into dict with required properties"""
-    if user.is_anonymous:
-        return {'key': str(user), 'custom': {'organization': None}}
-    user_data = {'email': user.email}
-    user_data['key'] = user_data['email']
-    if user.active_organization is not None:
-        user_data['custom'] = {'organization': user.active_organization.created_by.email}
-    else:
-        user_data['custom'] = {'organization': None}
-    return user_data
+    """Turn user object into LaunchDarkly Context object"""
+    try:
+        if user is None or (hasattr(user, 'is_anonymous') and user.is_anonymous):
+            return Context.builder("anonymous").set("organization", None).build()
+
+        # Handle case where user might be a class instead of instance
+        if user == AnonymousUser:
+            return Context.builder("anonymous").set("organization", None).build()
+
+        context_key = getattr(user, 'email', None) or str(getattr(user, 'id', 'anonymous'))
+        builder = Context.builder(context_key)
+        
+        email = getattr(user, 'email', None)
+        if email:
+            builder.set("email", email)
+
+        if hasattr(user, 'active_organization') and user.active_organization is not None:
+            if hasattr(user.active_organization, 'created_by') and user.active_organization.created_by:
+                org_email = getattr(user.active_organization.created_by, 'email', None)
+                builder.set("organization", org_email)
+            else:
+                builder.set("organization", None)
+        else:
+            builder.set("organization", None)
+
+        return builder.build()
+    except Exception as e:
+        # Fallback to a simple context if there's any error
+        logger.warning(f"Error creating LaunchDarkly context: {e}")
+        return Context.builder("anonymous").set("organization", None).build()
 
 
 def flag_set(feature_flag, user=None, override_system_default=None):
@@ -91,7 +112,7 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         if request and getattr(request, 'user', None) and request.user.is_authenticated:
             user = request.user
 
-    user_dict = _get_user_repr(user)
+    user_context = _get_user_repr(user)
     env_value = get_bool_env(feature_flag, default=None)
     if env_value is not None:
         return env_value
@@ -99,16 +120,24 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         system_default = override_system_default
     else:
         system_default = settings.FEATURE_FLAGS_DEFAULT_VALUE
-    return client.variation(feature_flag, user_dict, system_default)
+    return client.variation(feature_flag, user_context, system_default)
+
+
+def safe_flag_set(flag_name, user='auto', default=False):
+    """Safe wrapper around flag_set to handle LaunchDarkly errors"""
+    try:
+        return flag_set(flag_name, user=user)
+    except Exception:
+        return default
 
 
 def all_flags(user):
     """Return the output of this method in API response, to bootstrap client-side flags.
     More on https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript
     """
-    user_dict = _get_user_repr(user)
-    logger.debug(f'Resolve all flags state for user {user_dict}')
-    state = client.all_flags_state(user_dict)
+    user_context = _get_user_repr(user)
+    logger.debug(f'Resolve all flags state for user {user_context}')
+    state = client.all_flags_state(user_context)
     flags = state.to_json_dict()
 
     env_ff = get_all_env_with_prefix('ff_', is_bool=True)

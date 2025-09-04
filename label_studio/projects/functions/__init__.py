@@ -1,11 +1,11 @@
-from core.feature_flags import flag_set
+from core.feature_flags import safe_flag_set
 from core.utils.db import SQCount
 from django.db.models import Count, OuterRef, Q
 from tasks.models import Annotation, Prediction, Task
 
 
 def annotate_task_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short', user='auto'):
+    if safe_flag_set('fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short', user='auto'):
         tasks = Task.objects.filter(project=OuterRef('id')).values_list('id')
         return queryset.annotate(task_number=SQCount(tasks))
     else:
@@ -13,7 +13,7 @@ def annotate_task_number(queryset):
 
 
 def annotate_finished_task_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short', user='auto'):
+    if safe_flag_set('fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short', user='auto'):
         tasks = Task.objects.filter(project=OuterRef('id'), is_labeled=True).values_list('id')
         return queryset.annotate(finished_task_number=SQCount(tasks))
     else:
@@ -21,11 +21,11 @@ def annotate_finished_task_number(queryset):
 
 
 def annotate_total_predictions_number(queryset):
-    if flag_set(
+    if safe_flag_set(
         'fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations',
         user='auto',
     ):
-        if flag_set(
+        if safe_flag_set(
             'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
             user='auto',
         ):
@@ -38,7 +38,7 @@ def annotate_total_predictions_number(queryset):
 
 
 def annotate_total_annotations_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+    if safe_flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
         subquery = Annotation.objects.filter(Q(project=OuterRef('pk')) & Q(was_cancelled=False)).values('id')
         return queryset.annotate(total_annotations_number=SQCount(subquery))
     else:
@@ -53,7 +53,7 @@ def annotate_num_tasks_with_annotations(queryset):
     # @todo: check do we really need this counter?
     # this function is very slow because of tasks__id and distinct
 
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+    if safe_flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
         subquery = (
             Annotation.objects.filter(
                 Q(project=OuterRef('pk')) & Q(ground_truth=False) & Q(was_cancelled=False) & Q(result__isnull=False)
@@ -76,7 +76,7 @@ def annotate_num_tasks_with_annotations(queryset):
 
 
 def annotate_useful_annotation_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+    if safe_flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk')) & Q(was_cancelled=False) & Q(ground_truth=False) & Q(result__isnull=False)
         ).values('id')
@@ -94,7 +94,7 @@ def annotate_useful_annotation_number(queryset):
 
 
 def annotate_ground_truth_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+    if safe_flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
         subquery = Annotation.objects.filter(Q(project=OuterRef('pk')) & Q(ground_truth=True)).values('id')
         return queryset.annotate(ground_truth_number=SQCount(subquery))
     else:
@@ -106,7 +106,7 @@ def annotate_ground_truth_number(queryset):
 
 
 def annotate_skipped_annotations_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+    if safe_flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
         subquery = Annotation.objects.filter(Q(project=OuterRef('pk')) & Q(was_cancelled=True)).values('id')
         return queryset.annotate(skipped_annotations_number=SQCount(subquery))
     else:

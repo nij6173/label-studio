@@ -41,8 +41,14 @@ def serve(request, path, document_root=None, show_indexes=False):
         raise Http404(_('“%(path)s” does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
     statobj = fullpath.stat()
-    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), statobj.st_mtime, statobj.st_size):
-        return HttpResponseNotModified()
+    # Django 4.0+ changed was_modified_since to only take header and mtime
+    try:
+        if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), statobj.st_mtime, statobj.st_size):
+            return HttpResponseNotModified()
+    except TypeError:
+        # Django 4.0+ version with different signature
+        if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), statobj.st_mtime):
+            return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(str(fullpath))
     content_type = content_type or 'application/octet-stream'
 

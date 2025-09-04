@@ -197,6 +197,7 @@ INSTALLED_APPS = [
     'annoying',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'drf_generators',
     'core',
     'users',
@@ -208,8 +209,12 @@ INSTALLED_APPS = [
     'data_manager',
     'io_storages',
     'ml',
+    'ml_model_providers',
+    'ml_models',
     'webhooks',
     'labels_manager',
+    'jwt_auth',
+    'session_policy',
 ]
 
 MIDDLEWARE = [
